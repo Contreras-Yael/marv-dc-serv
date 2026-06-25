@@ -28,30 +28,37 @@ res.json(personaje);
 }
 });
 
-app.get('/api/imagen-odio', (req, res) => {
+app.get('/api/imagen-odio', async (req, res) => {
   const urlReal = req.query.url;
   if (!urlReal) return res.status(400).send('Falta la URL de la imagen');
 
-  const opciones = {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    }
-  };
+  try {
+    // 1. Usamos fetch, que maneja redirecciones (301/302) automáticamente
+    const respuestaApi = await fetch(urlReal, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer': 'https://www.superherodb.com/'
+      }
+    });
 
-  require('https').get(urlReal, opciones, (respuestaApi) => {
-    
-    if (respuestaApi.statusCode !== 200) {
-      return res.status(404).send('Imagen no encontrada en el servidor externo');
+    // 2. Si el guardia nos sigue rechazando, lo imprimimos en tu terminal
+    if (!respuestaApi.ok) {
+      console.log(`Fallo en SuperHeroDB. Código exacto: ${respuestaApi.status}`);
+      return res.status(404).send('Imagen bloqueada');
     }
 
-    res.setHeader('Content-Type', 'image/jpeg');
+    // 3. Convertimos la imagen y la enviamos a Angular
+    const arrayBuffer = await respuestaApi.arrayBuffer();
+    const bufferImagen = Buffer.from(arrayBuffer);
+
+    res.setHeader('Content-Type', respuestaApi.headers.get('content-type') || 'image/jpeg');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-    respuestaApi.pipe(res);
+    res.send(bufferImagen);
 
-  }).on('error', (error) => {
-    console.error('Fallo en el puente de imagen:', error.message);
-    res.status(500).send('Error en el puente de imagen');
-  });
+  } catch (error) {
+    console.error('Error interno del puente:', error.message);
+    res.status(500).send('Error en el servidor');
+  }
 });
 
 

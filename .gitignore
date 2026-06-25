@@ -1,0 +1,41 @@
+# ==========================================
+# 1. Dependencias (La caja de herramientas pesada)
+# ==========================================
+node_modules/
+
+# ==========================================
+# 2. Archivos de entorno y seguridad (Tu caja fuerte)
+# ==========================================
+.env
+.env.local
+.env.*.local
+
+# ==========================================
+# 3. Registros de errores (Basura generada al fallar algo)
+# ==========================================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================================
+# 4. Carpetas de compilación de Angular (El producto final)
+# ==========================================
+dist/
+tmp/
+out-tsc/
+bazel-out/
+.angular/
+
+# ==========================================
+# 5. Archivos de tu editor de código (Configuraciones personales)
+# ==========================================
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ==========================================
+# 6. Basura del Sistema Operativo
+# ==========================================
+.DS_Store
+Thumbs.db
