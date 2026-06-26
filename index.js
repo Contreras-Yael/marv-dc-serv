@@ -28,6 +28,16 @@ res.json(personaje);
 }
 });
 
+app.get('/api/heroes', async(req, res) => {
+try{
+const personaje = await heroes_api();
+res.json(personaje);
+
+}  catch(error){
+    res.status(500).json({mensaje: 'No funciona, carga de personaje'});
+}
+});
+
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
