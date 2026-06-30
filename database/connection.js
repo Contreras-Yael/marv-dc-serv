@@ -11,17 +11,16 @@ async function heroes_api(cantidad) {
   for (let id = 1; id <= 20; id++) {
     try {
 
-        const respuesta = await fetch(`${url}/${id}`);
+      const respuesta = await fetch(`${url}/${id}`);
       
-      if (!respuesta.ok) continue;
+      if (!respuesta.ok);
 
       const personaje = await respuesta.json();
 
       lista_her.push(personaje);
       
     } catch (error) {
-      console.error(`Error descargando el ID ${id}:`, error.message);
-      continue; 
+      console.error(`Error descargando el ID ${id}:`, error.message); 
     }
   }
 
