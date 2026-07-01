@@ -6,9 +6,9 @@ async function heroes_api(cantidad) {
   const lista_her = [];
 
   console.log(`Total de elementos: ${cantidad}`);
-  console.log(`Se cargan 20 por ahora, rectificar y cambiar esto`);
+  console.log(`Se cargan 80 por ahora, rectificar y cambiar esto`);
 
-  for (let id = 1; id <= 20; id++) {
+  for (let id = 1; id <= 80; id++) {
     try {
 
       const respuesta = await fetch(`${url}/${id}`);
