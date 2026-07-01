@@ -1,6 +1,7 @@
 const key = '2f648a02029473f5456a17a6cf18f0fb'; 
 const url = `https://www.superheroapi.com/api.php/${key}`;//https://superheroapi.com{key}
-//
+
+const mongoose = require("mongoose");
 
 async function heroes_api(cantidad) {
   const lista_her = [];
@@ -12,8 +13,6 @@ async function heroes_api(cantidad) {
     try {
 
       const respuesta = await fetch(`${url}/${id}`);
-      
-      if (!respuesta.ok);
 
       const personaje = await respuesta.json();
 

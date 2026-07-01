@@ -1,17 +1,30 @@
+//dependencias
 const express = require('express');
 const cors = require("cors");
+//son las escenciales para el levantamiento de servidor y 
+const conect = require("./database/connection_2");
 const { heroes_api } = require('./database/connection');
 
-const app = express();
+conect();
 
+//creacion de servidor
+const app = express();
 const PORT = 3977;
 
 app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+//parece que esto ya esta
+
+const projectRoutes = require("./routes/project");
+
+app.use('/api/project', projectRoutes);
 
 app.get('/api/heroes', async(req, res) => {
+
+    console.log("llamado");
+
 try{
 const personaje = await heroes_api();
 res.json(personaje);
