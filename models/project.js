@@ -1,23 +1,23 @@
 //importar mongoose
 
-const {Schema, model} = requiere("mongoose");
+const {Schema, model} = require("mongoose");
 
 //crear esquema
-const projectSchema = Schema({
+const projectSchema = new Schema({
     name: {
         type: String,
-        reqired: true,
+        required: true,
         trim: true,
     },
     description:{
-        type:string
+        type: String,
     },
     state:{
         type: String,
-        required
+        required: true,
     },
     image:{
-        type: String(),
+        type: String,
         default:"default.png"
 
     },
@@ -28,5 +28,6 @@ const projectSchema = Schema({
 })
 
 
-module.exports = model("projectSchema")
+module.exports = model("Project", projectSchema); 
+
 
