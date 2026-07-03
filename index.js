@@ -7,7 +7,7 @@ const { heroes_api } = require('./database/connection');
 
 //creacion de servidor funciona en ambas partes 
 const app = express();
-const PORT = 3977;
+const PORT = 3000;
 
  app.use(cors());
  app.use(express.json());

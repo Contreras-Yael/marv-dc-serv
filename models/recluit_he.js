@@ -15,26 +15,26 @@ const heroschema = new Schema({
         },
     
     biography:{
-        "full-name":{type: String,},
-        "alter-egos":{type: String,},
-        "place-of-birth":{type: String,},
-        alignment:{type: String,},
+        "full-name":{type: String, default: "importa poco" },
+        "alter-egos":{type: String,default: "importa poco"},
+        "place-of-birth":{type: String,default: "importa poco"},
+        alignment:{type: String,default: "importa poco"},
     },
 
      appearance:{
-        gender: {type: String,},
-        race: {type: String,},
-        height: {type: String,},
-        weight: {type: String,},
-        "eye-color": {type: String,},
-        "hair-color": {type: String,},
+        gender: {type: String,default: "importa poco"},
+        race: {type: String,default: "importa poco"},
+        height: {type: String,default: "importa poco"},
+        weight: {type: String,default: "importa poco"},
+        "eye-color": {type: String,default: "importa poco"},
+        "hair-color": {type: String,default: "importa poco"},
     },
     work:{
-         occupation: { type: String},
-         base: {type: String}
+         occupation: { type: String, default: "importa poco"},
+         base: {type: String,default: "importa poco"}
     },
   image:{
-    url:{type: String} 
+    url:{type: String, default: "importa poco"} 
   },
 });
 

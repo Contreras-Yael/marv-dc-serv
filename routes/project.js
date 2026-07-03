@@ -11,6 +11,9 @@ const HeroController = require("../controllers/hero/heroes_controllers");
 
 router.post("/save", HeroController.save);
 router.get("/herolist", HeroController.herolist);
+router.get("/herolist/:id", HeroController.herolistind);
+router.put("/update", HeroController.updateher)
+router.delete("/delete/:id", HeroController.deletehero);
 //exportar rutas
 
 module.exports = router;
