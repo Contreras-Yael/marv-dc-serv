@@ -112,6 +112,7 @@ const deletehero=(req,res)=>{
 
 const updateher = (req,res) => {
     let body = req.body;
+    Hero.findByIdAndUpdate(body.id, body, { new: true })
 
     if(!body || !body.id){
         return res.status(404).send({
