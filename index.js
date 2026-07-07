@@ -2,8 +2,8 @@
 const express = require('express');
 const cors = require("cors");
 //son las escenciales para el levantamiento de servidor y 
-const conect = require("./database/connection_2");
-const { heroes_api } = require('./database/connection');
+const conect = require("./src/config/connection_2");
+const { heroes_api } = require('./src/config/connection');
 
 //creacion de servidor funciona en ambas partes 
 const app = express();
@@ -32,7 +32,7 @@ res.json(personaje);
 //conversion a objetos
  app.use(express.urlencoded({extended:true}));
 
- const heroroute = require("./routes/project");
+ const heroroute = require("./src/routes/project");
 
  app.use('/api/heroes', heroroute);
 
