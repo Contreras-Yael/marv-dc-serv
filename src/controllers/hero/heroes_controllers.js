@@ -144,58 +144,52 @@ const updateher = (req, res) => {
 
 const uploadim = (req, res) => {
     let id = req.params.id;
-
-    if (!req.file) {
-        return res.status(404).send({
-            status: "error",
-            message: "No se subió ninguna imagen"
-        });
-    }
     const filepath = req.file.path;
-    const extens = path.extname(req.file.originalname).toLowerCase().replace(".", "");
-    const valextend = ["png", "jpg", "jpeg", "gif"];
-
-    if (!valextend.includes(extens)) {
-        if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-
-        return res.status(400).json({
-            status: "error",
-            message: "Extensión inválida. Solo se permiten formatos png, jpg, jpeg o gif",
-        });
-    }
-
-    Hero.findByIdAndUpdate(id, { "image.url": req.file.filename }, { returnDocument: 'before' })
-        .then(heroupdat => {
-            if (!heroupdat) {
+    Hero.findById(id)
+        .then(heroFound => {
+            if (!heroFound) {
                 if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-                return res.status(404).send({
+                return res.status(404).send({ 
                     status: "error",
-                    message: "no se encontro el personaje destino"
+                    message: "No se encontro"
                 });
             }
-if (heroupdat.image && heroupdat.image.url && heroupdat.image.url !== "default.png" && heroupdat.image.url !== "") {
-    const oldImagePath = "./src/uploads/images/" + heroupdat.image.url;
-    if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-    }
-}
+            if (heroFound.image && heroFound.image.url) {
+                const oldFileName = heroFound.image.url.trim();
 
+                if (oldFileName !== "default.png" && oldFileName !== "" && oldFileName.length > 0) {
+                    const oldImagePath = path.join(__dirname, "../../uploads/images", oldFileName);
+                    
+                    try {
+                        if (fs.existsSync(oldImagePath) && fs.lstatSync(oldImagePath).isFile()) {
+                            fs.unlinkSync(oldImagePath);
+                        }
+                    } catch (err) {
+                        console.error("Error al remover imagen antigua:", err.message);
+                    }
+                }
+            }
+            return Hero.findByIdAndUpdate(id, { "image.url": req.file.filename }, { new: true });
+        })
+        .then(heroUpdated => {
+            if (!heroUpdated) return;
             return res.status(200).send({
                 status: "success",
-                message: "se actualizo la imagen",
-                hero: heroupdat
+                message: "Se actualizó la imagen correctamente",
+                hero: heroUpdated
             });
         })
         .catch(error => {
             if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-
+            console.error("Error en el flujo de la imagen:", error);
             return res.status(500).send({
                 status: "error",
-                message: "Error interno al ejecutar la consulta en MongoDB",
+                message: "Error interno al ejecutar el flujo de guardado",
                 error: error.message
             });
         });
 }
+
 
 const getim = (req, res) => {
 
@@ -213,9 +207,6 @@ const getim = (req, res) => {
             });
         }
     } );
-
-
-    
 }
 
 module.exports = {

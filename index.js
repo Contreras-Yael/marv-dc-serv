@@ -36,15 +36,6 @@ res.json(personaje);
 
  app.use('/api/heroes', heroroute);
 
-    // app.get('/prueba', (req,res)=>{
-
-    //     console.log("ejecucion del endpoint de prueba");
-    //     return res.status(200).send(`
-    //         <section>
-    //             <h1>Pruebas</h1>
-    //         </section>
-    //         `)
-    // });
     app.listen(PORT, () => {
         console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
     });
