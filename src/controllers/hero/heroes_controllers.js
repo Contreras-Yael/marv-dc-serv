@@ -3,7 +3,6 @@ const router = express.Router();
 
 const fs = require("fs");
 const path = require("path");
-const Project = require("../../models/recluit_he");
 const Hero = require("../../models/recluit_he");
 
 
@@ -113,36 +112,33 @@ const deletehero=(req,res)=>{
     });
 }
 
-const updateher = (req,res) => {
+const updateher = (req, res) => {
     let body = req.body;
-    Hero.findByIdAndUpdate(body.id, body, { new: true })
-
-    if(!body || !body.id){
+    if (!body || !body.id) {
         return res.status(404).send({
-            status:"error",
-            message:"No se encontro al heroe",
+            status: "error",
+            message: "No se encontro al heroe",
         });
     }
-    Hero.findByIdAndUpdate(body.id, body,{ new: true })
-        .then(heroupdat =>{
-            if(!heroupdat){
+    Hero.findByIdAndUpdate(body.id, body, { returnDocument: 'after' })
+        .then(heroupdat => {
+            if (!heroupdat) {
                 return res.status(404).send({
-                        status:"error",
-                        message:"No se encontro al heroe"
+                    status: "error",
+                    message: "No se encontro al heroe"
                 });
             }
             return res.status(200).send({
                 status: "success",
                 hero: heroupdat
-            })
+            });
         })
         .catch(error => {
             return res.status(500).send({
-                status:"error",
-                message:"No se encontro al heroe",
+                status: "error",
+                message: "Error al actualizar al heroe",
                 error
             });
-
         });
 }
 
@@ -168,7 +164,7 @@ const uploadim = (req, res) => {
         });
     }
 
-    Hero.findByIdAndUpdate(id, { "image.url": req.file.filename }, { new: false })
+    Hero.findByIdAndUpdate(id, { "image.url": req.file.filename }, { returnDocument: 'before' })
         .then(heroupdat => {
             if (!heroupdat) {
                 if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
@@ -177,15 +173,12 @@ const uploadim = (req, res) => {
                     message: "no se encontro el personaje destino"
                 });
             }
-
-            if (heroupdat.image && heroupdat.image.url !== "default.png") {
-                
-                const oldImagePath = "./src/uploads/images/" + heroupdat.image.url;
-
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
-            }
+if (heroupdat.image && heroupdat.image.url && heroupdat.image.url !== "default.png" && heroupdat.image.url !== "") {
+    const oldImagePath = "./src/uploads/images/" + heroupdat.image.url;
+    if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+    }
+}
 
             return res.status(200).send({
                 status: "success",
@@ -208,10 +201,10 @@ const getim = (req, res) => {
 
     let file = req.params.file;
 
-    let filepath = "./uploads/images/" + file;
+    let filepath = "./src/uploads/images/" + file;
 
     fs.stat(filepath, (error, exist)=>{
-        if(!errpr && exist){
+        if(!error && exist){
             return res.sendFile(path.resolve(filepath));
         } else {
             return res.status(404).send({

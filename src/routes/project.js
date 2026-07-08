@@ -16,7 +16,7 @@ router.get("/herolist", HeroController.herolist);
 router.get("/herolist/:id", HeroController.herolistind);
 router.put("/update", HeroController.updateher)
 router.delete("/delete/:id", HeroController.deletehero);
-router.put("/upload/:id", upload.single("image"), HeroController.uploadim);
+router.put("/upload/:id", upload.single("file"), HeroController.uploadim);
 router.get("/image/:file", HeroController.getim)
 //exportar rutas
 
