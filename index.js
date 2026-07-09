@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require("cors");
 //son las escenciales para el levantamiento de servidor y 
 const conect = require("./src/config/connection_2");
+// const prueba = require("./src/config/connection_3");
+//const { conectarDB } = require('./src/config/connection_3');
+
 const { heroes_api } = require('./src/config/connection');
 
 //creacion de servidor funciona en ambas partes 
@@ -14,13 +17,10 @@ const PORT = 3000;
 
 
 app.get('/api/heroes', async(req, res) => {
-
     console.log("llamado");
-
 try{
 const personaje = await heroes_api();
 res.json(personaje);
-
 }  catch(error){
     res.status(500).json({mensaje: 'No funciona, carga de personaje'});
 }
@@ -39,3 +39,4 @@ res.json(personaje);
     app.listen(PORT, () => {
         console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
     });
+
