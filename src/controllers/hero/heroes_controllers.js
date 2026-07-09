@@ -6,34 +6,32 @@ const path = require("path");
 const Hero = require("../../models/recluit_he");
 
 
-const save = (req, res)=>{
-    let body = req.body;
-    if(!body.name){
-        return res.status(400).send({
-            status:"error",
-            message:"faltan datos por enviar"
-        });
-    }
-    let herosav = new Hero(body);
-    herosav.save().then(herosav => {
-        if(!herosav){
-            return res.status(404).send({
-                status: "success",
-                message:"Recluta guardado",
-            });
-        }
-        return res.status(200).send({
-            status: "success",
-            herosav
-        });
-    }).catch(error =>{
-        return res.status(500).send({
-            status: "error",
-            message:"Error al guaradar",
-            error:"",
-        });
+const save = (req, res) => {
+  let body = req.body;
+
+  if (!body.name) {
+    return res.status(400).send({
+      status: "error",
+      message: "Faltan datos por enviar"
+    });
+  }
+  let herosav = new Hero(body);
+  herosav.save()
+    .then(herosav => {
+      return res.status(201).send({
+        status: "success",
+        message: "Recluta guardado",
+        herosav
+      });
     })
-}
+    .catch(error => {
+      return res.status(500).send({
+        status: "error",
+        message: "Error al guardar",
+        error: error.message
+      });
+    });
+};
 
 const herolist=(req, res) =>{
     Hero.find()
