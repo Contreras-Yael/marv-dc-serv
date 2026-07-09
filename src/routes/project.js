@@ -21,3 +21,4 @@ router.get("/image/:file", HeroController.getim)
 module.exports = router;
 
 //usar el modelo en los routes
+
