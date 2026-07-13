@@ -1,21 +1,21 @@
-const {MongoClient} = require ('mongodb') ;
+const { MongoClient } = require("mongodb");
 
-const url = "mongodb://127.0.0.1:27017";
-const client = new MongoClient(url);
-let db = null;
-
-async function conectarDB() {
+const Coneccion = async () => {
   try {
-  await client.connect();
-  db = client.db("hero_academy");
-  console.log("Parece funcionar el mogoclient");
+    const url = "mongodb://127.0.0.1:27017/hero_academy";
+
+    const client = await MongoClient.connect(url);
+    
+    const db = client.db();
+
+    console.log("Conexion client");
+    
+    return db;
+    
   } catch (error) {
-    console.error("Pues algo fallo en la conexion:", error);
+    console.error("Fallo la conexion de mongoclient:", error);
+    throw error;
   }
-}
+};
 
-function getDB() {
-  return db;
-}
-
-module.exports = { conectarDB, getDB };
+module.exports = { Coneccion };

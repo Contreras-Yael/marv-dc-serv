@@ -5,7 +5,7 @@ const connection = async() => {
     try{
         await mongoose.connect("mongodb://127.0.0.1:27017/hero_academy");
 
-        console.log("Conexion con heroes");
+        console.log("Conexion con localhost");
 
     }catch(error){
         console.log(error);
