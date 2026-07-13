@@ -38,6 +38,50 @@ app.get('/api/heroes-internet/:id', async(req, res) => {
 });
 
 
+// // ====== API INTERNET INDIVIDUAL OPTIMIZADA (CON MONGO CLIENT) ======
+// app.get('/api/heroes-internet/:id', async(req, res) => {
+//     const idBuscada = req.params.id;
+//     console.log(`🚀 Búsqueda optimizada para el ID: ${idBuscada}`);
+    
+//     try {
+//         // 1. Conectamos a tu MongoDB local mediante MongoClient
+//         const db = await Coneccion();
+        
+//         // 2. 🧠 Buscamos PRIMERO en tu base de datos local
+//         // Nota: Asegúrate de guardarlo como string o número según tu estructura.
+//         let personaje = await db.collection("heros").findOne({ id: idBuscada.toString() });
+        
+//         if (personaje) {
+//             console.log("⚡ [Moneo de Cache] Encontrado en MongoDB local al instante!");
+//             return res.json(personaje); // Retorna de inmediato y corta la función
+//         }
+        
+//         // 3. 🌐 Si NO estaba en Mongo, solo entonces vamos a internet (Carga lenta de respaldo)
+//         console.log("🐢 No estaba en BD. Descargando de internet por única vez...");
+//         const listaCompleta = await heroes_api();
+//         personaje = listaCompleta.find(h => h.id.toString() === idBuscada.toString());
+        
+//         if (!personaje) {
+//             return res.status(404).json({ mensaje: 'Héroe no encontrado en ninguna parte' });
+//         }
+        
+//         // 4. 💾 Lo guardamos en tu Mongo para que la PRÓXIMA vez sea instantáneo
+//         // Le agregamos el campo id como string para asegurar futuras búsquedas
+//         await db.collection("heros").insertOne({ ...personaje, id: idBuscada.toString() });
+//         console.log(`💾 Héroe ${personaje.name} guardado en Mongo Local para cache.`);
+
+//         res.json(personaje);
+
+//     } catch(error) {
+//         console.error("Error en endpoint optimizado:", error);
+//         res.status(500).json({ mensaje: 'Error al procesar la carga optimizada' });
+//     }
+// });
+
+
+
+
+
 app.get('/api/heroes-internet', async(req, res) => {
     console.log("Api dee heroes en internet");
     try {
