@@ -1,10 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const ObjectId = require('mongodb').ObjectId;
 
 const fs = require("fs");
 const path = require("path");
-const Hero = require("../../models/recluit_he");
+//const Hero = require("../../models/recluit_he");
 
+// const hero2 = require("");
+
+const { conectarmcli } = require('../../config/connection_3'); 
 
 const save = (req, res) => {
   let body = req.body;
@@ -33,28 +37,59 @@ const save = (req, res) => {
     });
 };
 
-const herolist=(req, res) =>{
-    Hero.find()
-        .then(herosav =>{
-            if(!herosav){
-                return res.status(404).send({
-                    status:"error",
-                    message:"No hay proyectos para mostrar"
-                });
-            }  
-            return res.status(200).send({
-                status:"success",
-                herosav
+// const herolist=(req, res) =>{
+//     Hero.find()
+
+//         .then(herosav =>{
+//             if(!herosav){
+//                 return res.status(404).send({
+//                     status:"error",
+//                     message:"No hay proyectos para mostrar"
+//                 });
+//             }  
+//             return res.status(200).send({
+//                 status:"success",
+//                 herosav
+//             });
+//         })
+//         .catch(error =>{
+//            return res.status(500).json({ 
+//             mensaje: "Error lectura",
+//             error: error.message 
+//             });
+//         });
+// }
+
+
+const herolist = async (req, res) => {
+    try {
+        const db = await conectarmcli();
+
+        const herosav = await db.collection("heros").find().toArray();
+
+        if (!herosav || herosav.length === 0) {
+            return res.status(404).json({
+                status: "error",
+                message: "No encontro heroes"
             });
-        })
-        .catch(error =>{
-            return res.status().send({
-                status:"error",
-                message:"error al listar los proyectos",
-                error
-            });
+        }  
+
+        return res.status(200).json({
+            status: "success",
+            herosav
         });
+
+    } catch (error) {
+        console.error("Error de mongo client:", error);
+        
+        return res.status(500).json({ 
+            status: "error",
+            mensaje: "Error lectura en el driver nativo",
+            error: error.message 
+        });
+    }
 }
+
 
 const herolistind=(req, res) =>{
     let id= req.params.id;
@@ -110,35 +145,94 @@ const deletehero=(req,res)=>{
     });
 }
 
-const updateher = (req, res) => {
-    let body = req.body;
-    if (!body || !body.id) {
-        return res.status(404).send({
-            status: "error",
-            message: "No se encontro al heroe",
+const updateher = async(req, res) => {
+try{
+    const db = await conectarmcli();
+    const heroid = req.body.id || req.body._id;
+
+    if(!heroid){
+        return res.status(400).json({
+        status: "error", mensaje: "Falta el ID en el cuerpo de la petición" 
         });
     }
-    Hero.findByIdAndUpdate(body.id, body, { returnDocument: 'after' })
-        .then(heroupdat => {
-            if (!heroupdat) {
-                return res.status(404).send({
-                    status: "error",
-                    message: "No se encontro al heroe"
-                });
-            }
-            return res.status(200).send({
-                status: "success",
-                hero: heroupdat
-            });
+
+    let update = { ...req.body };
+    var {name} = req.body;
+
+    delete update.id;
+    delete update._id;
+    
+
+    const resultado = await db.collection("heros").updateOne(
+        { _id: new ObjectId(heroid) }, 
+        { $set: update }
+    );
+
+    if(resultado.matchedCount === 0){
+        return res.status(404).json({
+            status: "error",
+            message: "No se encontró el héroe en la base de datos local"
         })
-        .catch(error => {
-            return res.status(500).send({
-                status: "error",
-                message: "Error al actualizar al heroe",
-                error
-            });
-        });
+    }
+
+        return res.status(200).json({
+        status: "success",
+        mensaje: "Actualizado ",
+        modificados: resultado.modifiedCount
+    });
+
+}catch(error){
+    console.log(error);
+response.code = 500
 }
+
+}
+
+
+    // if (!body || !body.id) {
+    //     return res.status(404).send({
+    //         status: "error",
+    //         message: "No se encontro al heroe",
+    //     });
+    // }
+
+        
+
+    //     const herosav = await db.collection("heros").find().toArray();
+
+    //     find
+
+        // if(){
+
+        // }
+
+    // let body = req.body;
+    // if (!body || !body.id) {
+    //     return res.status(404).send({
+    //         status: "error",
+    //         message: "No se encontro al heroe",
+    //     });
+    // }
+    // Hero.findByIdAndUpdate(body.id, body, { returnDocument: 'after' })
+    //     .then(heroupdat => {
+    //         if (!heroupdat) {
+    //             return res.status(404).send({
+    //                 status: "error",
+    //                 message: "No se encontro al heroe"
+    //             });
+    //         }
+    //         return res.status(200).send({
+    //             status: "success",
+    //             hero: heroupdat
+    //         });
+    //     })
+    //     .catch(error => {
+    //         return res.status(500).send({
+    //             status: "error",
+    //             message: "Error al actualizar al heroe",
+    //             error
+    //         });
+    //     });
 
 const uploadim = (req, res) => {
     let id = req.params.id;

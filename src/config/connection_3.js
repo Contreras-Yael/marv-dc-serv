@@ -4,21 +4,19 @@ const url = "mongodb://127.0.0.1:27017";
 
 const client = new MongoClient(url);
 
-
-const conectarmcli = async () => {
+async function conectarmcli() {
   try {
     await client.connect();
-
-    const db = client.db("hero_academy");
-
-    console.log(" Conexion a Mongoclient");
-
-    return db;
+    
+    const baseDatos = client.db("hero_academy");
+    
+    console.log("Conexion a Mongo");
+    return baseDatos; 
   } catch (error) {
-    console.error("Algo fallo:", error);
+    console.error("Error connection_3:", error);
     throw error;
   }
-};
+}
 
 module.exports = {
   conectarmcli,
