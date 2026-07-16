@@ -10,55 +10,47 @@ const path = require("path");
 
 const { conectarmcli } = require('../../config/connection_3'); 
 
-const save = (req, res) => {
-  let body = req.body;
 
-  if (!body.name) {
-    return res.status(400).send({
+
+const save = async (req, res) => {
+  try {
+    const db = await conectarmcli();
+
+    const body = req.body;
+
+    if (!body.name) {
+      return res.status(400).json({
+        status: "error",
+        message: "Faltan datos por enviar"
+      });
+    }
+
+    // MongoDB agrega automáticamente el _id
+    const resultado = await db
+      .collection("heros")
+      .insertOne(body);
+
+    const herosav = {
+      ...body,
+      _id: resultado.insertedId
+    };
+
+    return res.status(201).json({
+      status: "success",
+      message: "Recluta guardado",
+      herosav
+    });
+
+  } catch (error) {
+    console.error("Error al guardar:", error);
+
+    return res.status(500).json({
       status: "error",
-      message: "Faltan datos por enviar"
+      message: "Error al guardar",
+      error: error.message
     });
   }
-  let herosav = new Hero(body);
-  herosav.save()
-    .then(herosav => {
-      return res.status(201).send({
-        status: "success",
-        message: "Recluta guardado",
-        herosav
-      });
-    })
-    .catch(error => {
-      return res.status(500).send({
-        status: "error",
-        message: "Error al guardar",
-        error: error.message
-      });
-    });
 };
-
-// const herolist=(req, res) =>{
-//     Hero.find()
-
-//         .then(herosav =>{
-//             if(!herosav){
-//                 return res.status(404).send({
-//                     status:"error",
-//                     message:"No hay proyectos para mostrar"
-//                 });
-//             }  
-//             return res.status(200).send({
-//                 status:"success",
-//                 herosav
-//             });
-//         })
-//         .catch(error =>{
-//            return res.status(500).json({ 
-//             mensaje: "Error lectura",
-//             error: error.message 
-//             });
-//         });
-// }
 
 
 const herolist = async (req, res) => {
@@ -117,33 +109,40 @@ const herolistind=(req, res) =>{
         });
 }
 
-const deletehero=(req,res)=>{
+const deletehero = async (req, res) => {
+  try {
+    const db = await conectarmcli();
+    const id = req.params.id;
 
-    let id= req.params.id;
-
-    Hero.findByIdAndDelete(id)
-    //.deleteOne()    
-    .then(hero => {
-        if(!hero){
-            return res.status(404).send({
-                    status:"error",
-                    message:"No se encontro al heroe"
-            });
-        }
-        return res.status(200).send({
-            status:"success",
-            hero
-        });
-    })
-    .catch(error => {
-        
-        return res.status(500).send({
-            status:"error",
-            message:"No se encontro al heroe",
-            error
-        });
+    const hero = await db.collection("heros").findOne({
+      _id: new ObjectId(id)
     });
-}
+
+    if (!hero) {
+      return res.status(404).send({
+        status: "error",
+        message: "No se encontró al héroe"
+      });
+    }
+
+    await db.collection("heros").deleteOne({
+      _id: new ObjectId(id)
+    });
+
+    return res.status(200).send({
+      status: "success",
+      hero
+    });
+
+  } catch (error) {
+    return res.status(500).send({
+      status: "error",
+      message: "Error al eliminar al héroe",
+      error: error.message
+    });
+  }
+};
+
 
 const updateher = async(req, res) => {
 try{
@@ -188,118 +187,106 @@ response.code = 500
 
 }
 
+const uploadim = async (req, res) => {
+  let id = req.params.id;
+  const filepath = req.file.path;
 
-    // if (!body || !body.id) {
-    //     return res.status(404).send({
-    //         status: "error",
-    //         message: "No se encontro al heroe",
-    //     });
-    // }
+  try {
+    const db = await conectarmcli();
 
-        
+    // Antes: Hero.findById(id)
+    const heroFound = await db.collection("heros").findOne({
+      _id: new ObjectId(id)
+    });
 
-    //     const herosav = await db.collection("heros").find().toArray();
+    if (!heroFound) {
+      if (fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath);
+      }
+      return res.status(404).send({
+        status: "error",
+        message: "No se encontró"
+      });
+    }
 
-    //     find
+    // Eliminar la imagen anterior
+    if (heroFound.image && heroFound.image.url) {
+      const oldFileName = heroFound.image.url.trim();
 
-        // if(){
+      if (
+        oldFileName !== "default.png" &&
+        oldFileName !== ""
+      ) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../../uploads/images",
+          oldFileName
+        );
 
-        // }
+        if (
+          fs.existsSync(oldImagePath) &&
+          fs.lstatSync(oldImagePath).isFile()
+        ) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+    }
 
-    // let body = req.body;
-    // if (!body || !body.id) {
-    //     return res.status(404).send({
-    //         status: "error",
-    //         message: "No se encontro al heroe",
-    //     });
-    // }
-    // Hero.findByIdAndUpdate(body.id, body, { returnDocument: 'after' })
-    //     .then(heroupdat => {
-    //         if (!heroupdat) {
-    //             return res.status(404).send({
-    //                 status: "error",
-    //                 message: "No se encontro al heroe"
-    //             });
-    //         }
-    //         return res.status(200).send({
-    //             status: "success",
-    //             hero: heroupdat
-    //         });
-    //     })
-    //     .catch(error => {
-    //         return res.status(500).send({
-    //             status: "error",
-    //             message: "Error al actualizar al heroe",
-    //             error
-    //         });
-    //     });
+    // Antes: Hero.findByIdAndUpdate(...)
+    await db.collection("heros").updateOne(
+      {
+        _id: new ObjectId(id)
+      },
+      {
+        $set: {
+          "image.url": req.file.filename
+        }
+      }
+    );
 
-const uploadim = (req, res) => {
-    let id = req.params.id;
-    const filepath = req.file.path;
-    Hero.findById(id)
-        .then(heroFound => {
-            if (!heroFound) {
-                if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-                return res.status(404).send({ 
-                    status: "error",
-                    message: "No se encontro"
-                });
-            }
-            if (heroFound.image && heroFound.image.url) {
-                const oldFileName = heroFound.image.url.trim();
+    // Extraemos nuevamente al héroe actualizado
+    const heroUpdated = await db.collection("heros").findOne({
+      _id: new ObjectId(id)
+    });
 
-                if (oldFileName !== "default.png" && oldFileName !== "" && oldFileName.length > 0) {
-                    const oldImagePath = path.join(__dirname, "../../uploads/images", oldFileName);
-                    
-                    try {
-                        if (fs.existsSync(oldImagePath) && fs.lstatSync(oldImagePath).isFile()) {
-                            fs.unlinkSync(oldImagePath);
-                        }
-                    } catch (err) {
-                        console.error("Error al remover imagen antigua:", err.message);
-                    }
-                }
-            }
-            return Hero.findByIdAndUpdate(id, { "image.url": req.file.filename }, { new: true });
-        })
-        .then(heroUpdated => {
-            if (!heroUpdated) return;
-            return res.status(200).send({
-                status: "success",
-                message: "Se actualizó la imagen correctamente",
-                hero: heroUpdated
-            });
-        })
-        .catch(error => {
-            if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-            console.error("Error en el flujo de la imagen:", error);
-            return res.status(500).send({
-                status: "error",
-                message: "Error interno al ejecutar el flujo de guardado",
-                error: error.message
-            });
-        });
-}
+    return res.status(200).send({
+      status: "success",
+      message: "Se actualizó la imagen correctamente",
+      hero: heroUpdated
+    });
 
+  } catch (error) {
+    if (fs.existsSync(filepath)) {
+      fs.unlinkSync(filepath);
+    }
+
+    console.error("Error en el flujo de la imagen:", error);
+
+    return res.status(500).send({
+      status: "error",
+      message: "Error interno al guardar la imagen",
+      error: error.message
+    });
+  }
+};
 
 const getim = (req, res) => {
+  let file = req.params.file;
 
-    let file = req.params.file;
+  let filepath = path.join( __dirname, "../../uploads/images",file);
 
-    let filepath = "./src/uploads/images/" + file;
+  fs.stat(filepath, (error, exist) => {
+    if (!error && exist) {
+      return res.sendFile(path.resolve(filepath));
+    }
 
-    fs.stat(filepath, (error, exist)=>{
-        if(!error && exist){
-            return res.sendFile(path.resolve(filepath));
-        } else {
-            return res.status(404).send({
-                status: "error",
-                message: "Sacando la imagen"
-            });
-        }
-    } );
-}
+    return res.status(404).send({
+      status: "error",
+      message: "No se encontró la imagen"
+    });
+  });
+};
+
 
 module.exports = {
     save,
