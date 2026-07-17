@@ -5,32 +5,20 @@ const router = express.Router();
 // cargar controlador
 const HeroController = require("../controllers/hero/heroes_controllers");
 const upload = require("../middlewares/upload");
+const validate = require('../middlewares/validate')
 const model = require("../models/recluit_he");
 const Heroemodel = require("../controllers/hero/heroes.model");
 
-const validar = (req, res, next) => {
-const errores = validationResult(req);
-
-  if (!errores.isEmpty()) {
-    return res.status(400).json({
-      status: "error",
-      errores: errores.array()
-    });
-  }
-
-  next();
-};
-
-
-router.post("/save", HeroController.save);
+//gets
 router.get("/herolist", HeroController.herolist);
 router.get("/herolist/:id", HeroController.herolistind);
+router.get("/image/:file", HeroController.getim)
+
+// aca se usa el modelo
+router.post("/save",Heroemodel.create ,HeroController.save);
 router.put("/update", Heroemodel.edit, HeroController.updateher)
 router.delete("/delete/:id", HeroController.deletehero);
 router.put("/upload/:id", upload.single("file"), HeroController.uploadim);
-
-
-router.get("/image/:file", HeroController.getim)
 
 
 module.exports = router;
